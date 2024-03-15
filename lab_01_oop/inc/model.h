@@ -5,11 +5,8 @@
 #include <errorcodes.h>
 
 struct my_model {
-    point_t *points_arr;
-    size_t points_alen;
-
-    edge_t *edges_arr;
-    size_t edges_alen;
+    points_t points;
+    edges_t edges;
 };
 using model_t = struct my_model;
 

@@ -2,7 +2,7 @@
 
 error_t action_handler(request_t &req) {
     static model_t model = init_model();
-    error_t rc;
+    error_t rc = SUCCESS;
 
     switch (req.action) {
     case LOAD:
@@ -21,7 +21,7 @@ error_t action_handler(request_t &req) {
         rc = scale_model(model, req.scale_data);
         break;
     case RENDER:
-        rc = render_model(model, req.render_data);
+        rc = render_model(req.render_data, model);
         break;
     default:
         break;

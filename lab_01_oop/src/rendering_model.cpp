@@ -1,6 +1,6 @@
 #include "rendering_model.h"
 
-error_t render_model(model_t &model, render_t &params) {
+error_t render_model(render_t &params, model_t &model) {
     if (!model.edges_arr)
         return NO_MODEL_ERROR;
 

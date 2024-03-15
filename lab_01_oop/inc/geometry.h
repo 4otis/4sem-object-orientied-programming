@@ -15,6 +15,18 @@ struct point {
 };
 using point_t = struct point;
 
+struct my_points {
+    point_t *points_arr;
+    size_t points_alen;
+};
+using points_t = struct my_points;
+
+struct my_edges {
+    edge_t *edges_arr;
+    size_t edges_alen;
+};
+using edges_t = struct my_edges;
+
 struct edge {
     size_t p1_ind;
     size_t p2_ind;
@@ -47,21 +59,20 @@ using scale_t = struct scale;
 point_t *alloc_points(size_t &alen);
 void destroy_points(point_t *arr);
 
-error_t scan_points_amount(FILE *f, size_t &amount);
-error_t scan_all_points(FILE *f, point_t *arr, size_t &alen);
-error_t write_points_amount(FILE *f, size_t &amount);
-error_t write_all_points(FILE *f, point_t *arr, size_t &alen);
+error_t scan_points_amount(size_t &amount, FILE *f);
+error_t scan_all_points(point_t *arr, size_t &alen, FILE *f);
 
-error_t move_all_points(move_t &params, point_t *arr, size_t &alen);
-error_t rotate_all_points(rotate_t &params, point_t *arr, size_t &alen);
-error_t scale_all_points(scale_t &params, point_t *arr, size_t &alen);
+error_t read_points(points_t &points, FILE *f);
+error_t write_points(points_t &points, FILE *f);
+
+error_t move_all_points(point_t *arr, size_t &alen, move_t &params);
+error_t rotate_all_points(point_t *arr, size_t &alen, rotate_t &params);
+error_t scale_all_points(point_t *arr, size_t &alen, scale_t &params);
 
 edge_t *alloc_edges(size_t &alen);
 void destroy_edges(edge_t *arr);
 
-error_t scan_edges_amount(FILE *f, size_t &amount);
-error_t scan_all_edges(FILE *f, edge_t *arr, size_t &alen, size_t &points_amount);
-error_t write_edges_amount(FILE *f, size_t &amount);
-error_t write_all_edges(FILE *f, edge_t *arr, size_t &alen);
+error_t read_edges(edges_t &edges, FILE *f);
+error_t write_edges(edges_t &edges, FILE *f);
 
 #endif // GEOMETRY_H

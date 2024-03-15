@@ -13,7 +13,7 @@ struct render {
 };
 using render_t = struct render;
 
-error_t render_model(model_t &model, render_t &params);
+error_t render_model(render_t &params, model_t &model);
 void render_all_edges(render_t &params, model_t &model);
 void render_edge(render_t &params, point_t &p1, point_t &p2);
 void clear_scene(render_t &params);
