@@ -3,6 +3,7 @@
 error_t action_handler(request_t &req) {
     static model_t model = init_model();
     error_t rc = SUCCESS;
+    // обработать плохую команду
 
     switch (req.action) {
     case LOAD:

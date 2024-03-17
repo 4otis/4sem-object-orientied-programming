@@ -20,7 +20,7 @@ struct save {
 };
 using save_t = struct save;
 
-model_t &init_model();
+model_t init_model();
 error_t load_model(model_t &model, load_t &data);
 error_t save_model(model_t &model, save_t &data);
 error_t move_model(model_t &model, move_t &data);

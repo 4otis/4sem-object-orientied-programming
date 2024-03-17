@@ -3,44 +3,70 @@
 
 model_t init_model() {
     model_t tmp;
-    tmp.points_arr = nullptr;
-    tmp.points_alen = 0;
-    tmp.edges_arr = nullptr;
-    tmp.edges_alen = 0;
+
+    init_points(tmp.points);
+    init_edges(tmp.edges);
+
     return tmp;
 }
 
 bool is_model_emty(model_t &model) {
-    if (!model.points_arr || !model.edges_arr)
+    if (is_points_empty(model.points) && is_edges_empty(model.edges))
         return true;
     return false;
 }
 
 void free_model(model_t &model) {
-    destroy_points(model.points_arr);
-    destroy_edges(model.edges_arr);
+    destroy_points(model.points);
+    destroy_edges(model.edges);
+}
+
+error_t copy_model(model_t &dst, model_t &src) {
+    dst.points.arr = alloc_points(get_points_amount(src.points));
+    dst.edges.arr = alloc_edges(get_edges_amount(src.edges));
+
+    if (is_points_empty(dst.points) || is_edges_empty(dst.edges))
+        return MEMORY_ALLOCATION_ERROR;
+
+    copy_points(dst.points, src.points);
+    copy_edges(dst.edges, src.edges);
+
+    return SUCCESS;
+}
+
+error_t read_model(model_t &model, FILE *f) {
+    error_t rc = read_points(model.points, f);
+    if (rc == SUCCESS)
+        rc = read_edges(model.edges, f);
+    // нельзя захватывать ресурс функцией
+    return rc;
 }
 
 error_t load_model(model_t &model, load_t &data) {
     error_t rc = SUCCESS;
 
-    if (!is_model_emty(model))
-        free_model(model);
-
     FILE *f = fopen(data.filename, "r");
     if (!f)
         rc = FILENAME_ERROR;
+    else {
+        model_t model_copied = init_model();
 
-    rc = read_points(model.points);
+        if (!is_model_emty(model)) {
+            copy_model(model_copied, model);
+            free_model(model);
+            model = init_model();
+        }
 
-    rc = read_edges(model.edges);
-
-    if (rc)
-        free_model(model);
-
-    if (rc == SUCCESS)
-
+        rc = read_model(model, f);
         fclose(f);
+        if (rc != SUCCESS) {
+            free_model(model);
+            if (!is_model_emty(model_copied))
+                copy_model(model, model_copied);
+        }
+
+        free_model(model_copied);
+    }
     return rc;
 }
 
@@ -53,35 +79,29 @@ error_t save_model(model_t &model, save_t &data) {
     FILE *f = fopen(data.filename, "w");
     if (!f)
         rc = FILENAME_ERROR;
+    else {
+        rc = write_points(model.points, f);
 
-    if (rc == SUCCESS)
-        rc = write_points_amount(model.points_alen, f);
+        if (rc == SUCCESS)
+            rc = write_edges(model.edges, f);
 
-    if (rc == SUCCESS)
-        write_all_points(model.points_arr, model.points_alen, f);
-
-    if (rc == SUCCESS)
-        write_edges_amount(model.edges_alen, f);
-
-    if (rc == SUCCESS)
-        write_all_edges(model.edges_arr, model.edges_alen, f);
-
-    fclose(f);
+        fclose(f);
+    }
 
     return SUCCESS;
 }
 
 error_t move_model(model_t &model, move_t &data) {
-    error_t rc = move_all_points(model.points_arr, model.points_alen, data);
+    error_t rc = move_all_points(model.points, data);
     return rc;
 }
 
 error_t rotate_model(model_t &model, rotate_t &data) {
-    error_t rc = rotate_all_points(model.points_arr, model.points_alen, data);
+    error_t rc = rotate_all_points(model.points, data);
     return rc;
 }
 
 error_t scale_model(model_t &model, scale_t &data) {
-    error_t rc = scale_all_points(model.points_arr, model.points_alen, data);
+    error_t rc = scale_all_points(model.points, data);
     return rc;
 }
