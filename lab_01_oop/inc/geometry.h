@@ -71,7 +71,6 @@ error_t write_points(points_t &points, FILE *f);
 void copy_points(points_t &dst, points_t &src);
 
 point_t get_point_by_ind(points_t &points, size_t ind);
-size_t get_points_amount(points_t &points);
 
 error_t move_all_points(points_t &points, move_t &params);
 error_t rotate_all_points(points_t &points, rotate_t &params);
@@ -89,6 +88,13 @@ void copy_edges(edges_t &dst, edges_t &src);
 
 size_t get_first_point_ind_by_ind(edges_t &edges, size_t ind);
 size_t get_second_point_ind_by_ind(edges_t &edges, size_t ind);
-size_t get_edges_amount(edges_t &edges);
+
+size_t &get_edges_amount(edges_t &edges);
+edge_t *get_edges_arr(edges_t &edges);
+size_t &get_points_amount(points_t &points);
+point_t *get_points_arr(points_t &points);
+
+void set_edges_arr(edges_t &edges, edge_t *arr);
+void set_points_arr(points_t &points, point_t *arr);
 
 #endif // GEOMETRY_H

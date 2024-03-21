@@ -56,11 +56,11 @@ error_t scan_all_points(points_t &points, FILE *f) {
 error_t read_points(points_t &points, FILE *f) {
     error_t rc = SUCCESS;
 
-    rc = scan_points_amount(points.alen, f);
+    rc = scan_points_amount(get_points_amount(points), f);
 
     if (rc == SUCCESS) {
-        points.arr = alloc_points(points.alen);
-        if (!points.arr)
+        set_points_arr(points, alloc_points(get_points_amount(points)));
+        if (!get_points_arr(points))
             rc = MEMORY_ALLOCATION_ERROR;
         else {
             rc = scan_all_points(points, f);
@@ -95,7 +95,7 @@ error_t write_all_points(points_t &points, FILE *f) {
 }
 
 error_t write_points(points_t &points, FILE *f) {
-    error_t rc = write_points_amount(points.alen, f);
+    error_t rc = write_points_amount(get_points_amount(points), f);
 
     if (rc == SUCCESS)
         rc = write_all_points(points, f);
@@ -111,8 +111,6 @@ void copy_points(points_t &dst, points_t &src) {
 }
 
 point_t get_point_by_ind(points_t &points, size_t ind) { return points.arr[ind]; }
-
-size_t get_points_amount(points_t &points) { return points.alen; }
 
 void move_point(point_t &p, move_t &params) {
     p.x = p.x + params.x;
@@ -267,8 +265,8 @@ error_t read_edges(edges_t &edges, FILE *f) {
     error_t rc = scan_edges_amount(edges.alen, f);
 
     if (rc == SUCCESS) {
-        edges.arr = alloc_edges(edges.alen);
-        if (!edges.arr)
+        set_edges_arr(edges, alloc_edges(get_edges_amount(edges)));
+        if (!get_edges_arr(edges))
             rc = MEMORY_ALLOCATION_ERROR;
         else {
             rc = scan_all_edges(edges, f);
@@ -280,7 +278,7 @@ error_t read_edges(edges_t &edges, FILE *f) {
     return rc;
 }
 
-error_t write_edges_amount(size_t &amount, FILE *f) {
+error_t write_edges_amount(size_t amount, FILE *f) {
     if (fprintf(f, "%zu\n", amount) < 0)
         return DATA_SAVING_ERROR;
     return SUCCESS;
@@ -293,14 +291,17 @@ int write_edge(edge_t &e, FILE *f) {
 }
 
 error_t write_all_edges(edges_t &edges, FILE *f) {
-    for (size_t i = 0; i < edges.alen; i++)
+    error_t rc = SUCCESS;
+
+    for (size_t i = 0; i < edges.alen && rc == SUCCESS; i++)
         if (write_edge(edges.arr[i], f))
-            return DATA_SAVING_ERROR;
-    return SUCCESS;
+            rc = DATA_SAVING_ERROR;
+
+    return rc;
 }
 
 error_t write_edges(edges_t &edges, FILE *f) {
-    error_t rc = write_edges_amount(edges.alen, f);
+    error_t rc = write_edges_amount(get_edges_amount(edges), f);
 
     if (rc == SUCCESS)
         rc = write_all_edges(edges, f);
@@ -319,4 +320,10 @@ size_t get_first_point_ind_by_ind(edges_t &edges, size_t ind) { return edges.arr
 
 size_t get_second_point_ind_by_ind(edges_t &edges, size_t ind) { return edges.arr[ind].p2_ind; }
 
-size_t get_edges_amount(edges_t &edges) { return edges.alen; }
+size_t &get_edges_amount(edges_t &edges) { return edges.alen; }
+edge_t *get_edges_arr(edges_t &edges) { return edges.arr; }
+size_t &get_points_amount(points_t &points) { return points.alen; }
+point_t *get_points_arr(points_t &points) { return points.arr; }
+
+void set_edges_arr(edges_t &edges, edge_t *arr) { edges.arr = arr; }
+void set_points_arr(points_t &points, point_t *arr) { points.arr = arr; }

@@ -22,16 +22,29 @@ void free_model(model_t &model) {
 }
 
 error_t copy_model(model_t &dst, model_t &src) {
-    dst.points.arr = alloc_points(get_points_amount(src.points));
-    dst.edges.arr = alloc_edges(get_edges_amount(src.edges));
+    error_t rc = SUCCESS;
 
-    if (is_points_empty(dst.points) || is_edges_empty(dst.edges))
-        return MEMORY_ALLOCATION_ERROR;
+    points_t tmp_points;
+    set_points_arr(tmp_points, alloc_points(get_points_amount(src.points)));
 
-    copy_points(dst.points, src.points);
-    copy_edges(dst.edges, src.edges);
+    edges_t tmp_edges;
+    set_edges_arr(tmp_edges, alloc_edges(get_edges_amount(src.edges)));
 
-    return SUCCESS;
+    if (is_points_empty(dst.points) || is_edges_empty(dst.edges)) {
+        rc = MEMORY_ALLOCATION_ERROR;
+        destroy_points(tmp_points);
+        destroy_edges(tmp_edges);
+    } else {
+        free_model(dst);
+
+        dst.points = tmp_points;
+        dst.edges = tmp_edges;
+
+        copy_points(dst.points, src.points);
+        copy_edges(dst.edges, src.edges);
+    }
+
+    return rc;
 }
 
 error_t read_model(model_t &model, FILE *f) {
@@ -59,7 +72,7 @@ error_t load_model(model_t &model, load_t &data) {
 
         if (rc == SUCCESS) {
             free_model(model);
-            copy_model(model, tmp_model);
+            rc = copy_model(model, tmp_model);
             free_model(tmp_model);
         }
     }
