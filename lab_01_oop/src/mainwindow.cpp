@@ -43,7 +43,6 @@ MainWindow::~MainWindow() { delete ui; }
 void MainWindow::on_MainWindow_destroyed() { delete scene; }
 
 void MainWindow::on_btnLoad_clicked() {
-    // QFileDialog::setNameFilter("*.txt");
     QString path = QFileDialog::getOpenFileName();
 
     request_t new_req;

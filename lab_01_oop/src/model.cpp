@@ -36,9 +36,11 @@ error_t copy_model(model_t &dst, model_t &src) {
 
 error_t read_model(model_t &model, FILE *f) {
     error_t rc = read_points(model.points, f);
-    if (rc == SUCCESS)
+    if (rc == SUCCESS) {
         rc = read_edges(model.edges, f);
-    // нельзя захватывать ресурс функцией
+        if (rc != SUCCESS)
+            free_model(model);
+    }
     return rc;
 }
 
@@ -49,23 +51,17 @@ error_t load_model(model_t &model, load_t &data) {
     if (!f)
         rc = FILENAME_ERROR;
     else {
-        model_t model_copied = init_model();
+        model_t tmp_model = init_model();
 
-        if (!is_model_emty(model)) {
-            copy_model(model_copied, model);
-            free_model(model);
-            model = init_model();
-        }
+        rc = read_model(tmp_model, f);
 
-        rc = read_model(model, f);
         fclose(f);
-        if (rc != SUCCESS) {
-            free_model(model);
-            if (!is_model_emty(model_copied))
-                copy_model(model, model_copied);
-        }
 
-        free_model(model_copied);
+        if (rc == SUCCESS) {
+            free_model(model);
+            copy_model(model, tmp_model);
+            free_model(tmp_model);
+        }
     }
     return rc;
 }

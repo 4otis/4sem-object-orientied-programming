@@ -44,10 +44,13 @@ int scan_point(point_t &p, FILE *f) {
 }
 
 error_t scan_all_points(points_t &points, FILE *f) {
-    for (size_t i = 0; i < points.alen; i++)
+    error_t rc = SUCCESS;
+
+    for (size_t i = 0; i < points.alen && rc == SUCCESS; i++)
         if (scan_point(points.arr[i], f))
-            return WRONG_DATA_ERROR;
-    return SUCCESS;
+            rc = WRONG_DATA_ERROR;
+
+    return rc;
 }
 
 error_t read_points(points_t &points, FILE *f) {
@@ -59,8 +62,11 @@ error_t read_points(points_t &points, FILE *f) {
         points.arr = alloc_points(points.alen);
         if (!points.arr)
             rc = MEMORY_ALLOCATION_ERROR;
-        else
+        else {
             rc = scan_all_points(points, f);
+            if (rc != SUCCESS)
+                destroy_points(points);
+        }
     }
 
     return rc;
@@ -79,10 +85,13 @@ int write_point(point_t &p, FILE *f) {
 }
 
 error_t write_all_points(points_t &points, FILE *f) {
-    for (size_t i = 0; i < points.alen; i++)
+    error_t rc = SUCCESS;
+
+    for (size_t i = 0; i < points.alen && rc == SUCCESS; i++)
         if (write_point(points.arr[i], f))
-            return DATA_SAVING_ERROR;
-    return SUCCESS;
+            rc = DATA_SAVING_ERROR;
+
+    return rc;
 }
 
 error_t write_points(points_t &points, FILE *f) {
@@ -245,10 +254,13 @@ int scan_edge(edge_t &e, FILE *f) {
 }
 
 error_t scan_all_edges(edges_t &edges, FILE *f) {
+    error_t rc = SUCCESS;
+
     for (size_t i = 0; i < edges.alen; i++)
         if (scan_edge(edges.arr[i], f))
-            return WRONG_DATA_ERROR;
-    return SUCCESS;
+            rc = WRONG_DATA_ERROR;
+
+    return rc;
 }
 
 error_t read_edges(edges_t &edges, FILE *f) {
@@ -258,8 +270,11 @@ error_t read_edges(edges_t &edges, FILE *f) {
         edges.arr = alloc_edges(edges.alen);
         if (!edges.arr)
             rc = MEMORY_ALLOCATION_ERROR;
-        else
+        else {
             rc = scan_all_edges(edges, f);
+            if (rc != SUCCESS)
+                destroy_edges(edges);
+        }
     }
 
     return rc;
