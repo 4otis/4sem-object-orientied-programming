@@ -14,7 +14,10 @@ void show_error(error_t error_code) {
     case NO_MODEL_ERROR:
         QMessageBox::critical(NULL, "Ошибка", "Необходимо сначала загрузить 3D модель.");
         break;
+    case INVALID_REQUEST_ERROR:
+        QMessageBox::critical(NULL, "Ошибка", "Некорректный запрос.");
+        break;
     default:
-        QMessageBox::critical(NULL, "Ошибка", "Smth goes wrong (;-( )");
+        QMessageBox::critical(NULL, "Ошибка", "Smth went wrong...");
     }
 }
