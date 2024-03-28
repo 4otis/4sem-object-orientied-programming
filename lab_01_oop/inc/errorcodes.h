@@ -1,9 +1,6 @@
 #ifndef ERRORCODES_H
 #define ERRORCODES_H
 
-#include <QDebug>
-#include <QMessageBox>
-
 enum errors {
     SUCCESS,
     MEMORY_ALLOCATION_TMP_MODEL_ERROR,
