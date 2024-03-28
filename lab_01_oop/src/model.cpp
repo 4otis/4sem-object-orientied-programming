@@ -30,7 +30,7 @@ error_t copy_model(model_t &dst, model_t &src) {
     edges_t tmp_edges;
     set_edges_arr(tmp_edges, alloc_edges(get_edges_amount(src.edges)));
 
-    if (is_points_empty(dst.points) || is_edges_empty(dst.edges)) {
+    if (is_points_empty(tmp_points) || is_edges_empty(tmp_edges)) {
         rc = MEMORY_ALLOCATION_ERROR;
         destroy_points(tmp_points);
         destroy_edges(tmp_edges);
@@ -71,9 +71,13 @@ error_t load_model(model_t &model, load_t &data) {
         fclose(f);
 
         if (rc == SUCCESS) {
-            free_model(model);
             rc = copy_model(model, tmp_model);
             free_model(tmp_model);
+
+            if (rc == MEMORY_ALLOCATION_TMP_MODEL_ERROR)
+                show_error(rc);
+
+            rc = SUCCESS;
         }
     }
     return rc;

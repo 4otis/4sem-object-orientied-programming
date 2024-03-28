@@ -2,6 +2,9 @@
 
 void show_error(error_t error_code) {
     switch (error_code) {
+    case MEMORY_ALLOCATION_TMP_MODEL_ERROR:
+        QMessageBox::critical(NULL, "Ошибка", "Не удалось выделить память под новую модель. Старая модель не была изменена.");
+        break;
     case MEMORY_ALLOCATION_ERROR:
         QMessageBox::critical(NULL, "Ошибка", "Не удалось выделить память.");
         break;
